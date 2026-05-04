@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SMK Negeri Pekanbaru- Sistem Bel Sekolah Otomatis</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 20px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        h1 {
+            color: #1e3c72;
+            font-size: 2rem;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .clock-card {
+            background: linear-gradient(135deg, #0f2027, #203a43);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 20px;
+            text-align: center;
+            color: white;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        #hariName {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+
+        #realTimeClock {
+            font-size: 4rem;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            letter-spacing: 5px;
+        }
+
+        #tanggal {
+            margin-top: 10px;
+            opacity: 0.8;
+        }
+
+        .status-card {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 20px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 10px 30px;
+            border-radius: 50px;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .status-aktif {
+            background: #10b981;
+            color: white;
+            animation: pulse 2s infinite;
+        }
+
+        .status-nonaktif {
+            background: #ef4444;
+            color: white;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .next-bell {
+            margin-top: 15px;
+            font-size: 1rem;
+            color: #666;
+        }
+
+        .schedule-card {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .schedule-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #333;
+            border-left: 4px solid #1e3c72;
+            padding-left: 15px;
+        }
+
+        .schedule-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 15px;
+        }
+
+        .schedule-item {
+            background: #f8fafc;
+            border-radius: 15px;
+            padding: 15px;
+            transition: transform 0.2s;
+            border-left: 4px solid;
+        }
+
+        .schedule-item.masuk { border-left-color: #10b981; }
+        .schedule-item.istirahat { border-left-color: #f59e0b; }
+        .schedule-item.pulang { border-left-color: #ef4444; }
+
+        .schedule-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .schedule-time {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #1e3c72;
+        }
+
+        .schedule-desc {
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .schedule-type {
+            font-size: 0.8rem;
+            margin-top: 8px;
+            padding: 3px 10px;
+            border-radius: 20px;
+            display: inline-block;
+        }
+
+        .type-masuk { background: #d1fae5; color: #065f46; }
+        .type-istirahat { background: #fed7aa; color: #92400e; }
+        .type-pulang { background: #fee2e2; color: #991b1b; }
+
+        .info-card {
+            background: #fef3c7;
+            border-radius: 15px;
+            padding: 15px;
+            margin-top: 20px;
+            text-align: center;
+            color: #92400e;
+        }
+
+        .btn-admin {
+            background: #1e3c72;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: transform 0.2s;
+        }
+
+        .btn-admin:hover {
+            transform: translateY(-2px);
+            background: #2a5298;
+        }
+
+        @media (max-width: 768px) {
+            #realTimeClock { font-size: 2.5rem; }
+            h1 { font-size: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>🔔 SMA NEGERI 1</h1>
+        <div class="subtitle">Sistem Bel Sekolah Otomatis</div>
+    </div>
+
+    <div class="clock-card">
+        <div id="hariName"></div>
+        <div id="realTimeClock"></div>
+        <div id="tanggal"></div>
+    </div>
+
+    <div class="status-card">
+        <div id="statusSekolah" class="status-badge">Memuat...</div>
+        <div class="next-bell" id="nextBell">⏰ Menghitung jadwal berikutnya...</div>
+    </div>
+
+    <div class="schedule-card">
+        <div class="schedule-title">📅 Jadwal Bel Hari Ini (Senin - Jumat)</div>
+        <div id="scheduleList" class="schedule-grid"></div>
+    </div>
+
+    <div class="info-card">
+        <strong>ℹ️ Info:</strong> Bel otomatis berbunyi sesuai jadwal.
+        <div>
+            <button class="btn-admin" onclick="window.location.href='admin.html'">🔐 Admin Panel</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    let schedules = [];
+
+    // Path ke folder sounds
+    const SOUNDS_PATH = {
+        masuk: 'sounds/jam_pelajaran.mp3',
+        istirahat: 'sounds/jam_istirahat.mp3',
+        pulang: 'sounds/jam_pulang.mp3'
+    };
+
+    function loadSchedules() {
+        const stored = localStorage.getItem('schoolBellSchedule');
+        if (stored) {
+            schedules = JSON.parse(stored);
+        } else {
+            schedules = [
+                { waktu: "06:30", keterangan: "Bel Masuk Pagi", jenis: "masuk" },
+                { waktu: "07:15", keterangan: "Bel Mulai Pelajaran", jenis: "masuk" },
+                { waktu: "08:45", keterangan: "Istirahat Pertama", jenis: "istirahat" },
+                { waktu: "09:15", keterangan: "Masuk Setelah Istirahat", jenis: "masuk" },
+                { waktu: "11:30", keterangan: "Istirahat Kedua (Sholat)", jenis: "istirahat" },
+                { waktu: "12:30", keterangan: "Masuk Kembali", jenis: "masuk" },
+                { waktu: "14:45", keterangan: "Bel Pulang Sekolah", jenis: "pulang" }
+            ];
+            localStorage.setItem('schoolBellSchedule', JSON.stringify(schedules));
+        }
+    }
+
+    function isSchoolDay() {
+        const day = new Date().getDay();
+        return day >= 1 && day <= 5;
+    }
+
+    function formatDate() {
+        const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+        const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+        const now = new Date();
+        return `${days[now.getDay()]}, ${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
+    }
+
+    function updateClock() {
+        const now = new Date();
+        const hours = now.getHours().toString().padStart(2, '0');
+        const minutes = now.getMinutes().toString().padStart(2, '0');
+        const seconds = now.getSeconds().toString().padStart(2, '0');
+        
+        document.getElementById('realTimeClock').innerHTML = `${hours}:${minutes}:${seconds}`;
+        document.getElementById('hariName').innerHTML = `📆 ${formatDate().split(',')[0]}`;
+        document.getElementById('tanggal').innerHTML = formatDate();
+    }
+
+    function playSound(jenis) {
+        const soundUrl = SOUNDS_PATH[jenis];
+        
+        if (soundUrl) {
+            const audio = new Audio(soundUrl);
+            audio.play().catch(err => {
+                console.log(`Gagal memainkan suara ${jenis}:`, err);
+                playFallbackSound();
+            });
+        } else {
+            playFallbackSound();
+        }
+        
+        // Visual feedback
+        const statusDiv = document.getElementById('statusSekolah');
+        statusDiv.style.transform = 'scale(1.05)';
+        setTimeout(() => {
+            statusDiv.style.transform = 'scale(1)';
+        }, 500);
+        
+        // Notifikasi
+        if (Notification.permission === 'granted') {
+            const jenisText = jenis === 'masuk' ? 'Masuk Pelajaran' : (jenis === 'istirahat' ? 'Istirahat' : 'Pulang');
+            new Notification('🔔 Waktu Bel Tiba!', {
+                body: `Bel ${jenisText} berbunyi`,
+                icon: 'https://cdn-icons-png.flaticon.com/512/1995/1995577.png'
+            });
+        }
+    }
+
+    function playFallbackSound() {
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioContext.state === 'suspended') {
+            audioContext.resume();
+        }
+        
+        const now = audioContext.currentTime;
+        const oscillator = audioContext.createOscillator();
+        const gain = audioContext.createGain();
+        
+        oscillator.connect(gain);
+        gain.connect(audioContext.destination);
+        oscillator.frequency.value = 880;
+        oscillator.type = 'sine';
+        gain.gain.setValueAtTime(0.3, now);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + 1.5);
+        
+        oscillator.start();
+        oscillator.stop(now + 1.5);
+    }
+
+    let lastPlayedTime = '';
+
+    function checkAndPlayBell() {
+        const now = new Date();
+        const currentTime = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+        
+        if (!isSchoolDay()) {
+            document.getElementById('statusSekolah').innerHTML = '🔕 SISTEM NONAKTIF (Sabtu/Minggu)';
+            document.getElementById('statusSekolah').className = 'status-badge status-nonaktif';
+            document.getElementById('nextBell').innerHTML = '📌 Akhir pekan, tidak ada jadwal bel';
+            return;
+        }
+        
+        document.getElementById('statusSekolah').innerHTML = '✅ SISTEM AKTIF (Senin - Jumat)';
+        document.getElementById('statusSekolah').className = 'status-badge status-aktif';
+        
+        const matchedSchedule = schedules.find(s => s.waktu === currentTime);
+        
+        if (matchedSchedule && lastPlayedTime !== currentTime) {
+            playSound(matchedSchedule.jenis);
+            lastPlayedTime = currentTime;
+            
+            const jenisText = matchedSchedule.jenis === 'masuk' ? 'MASUK' : (matchedSchedule.jenis === 'istirahat' ? 'ISTIRAHAT' : 'PULANG');
+            document.getElementById('nextBell').innerHTML = `🔔 BEL ${jenisText} BERBUNYI! ${matchedSchedule.keterangan} pukul ${currentTime}`;
+            setTimeout(() => updateNextBell(), 3000);
+        } else {
+            updateNextBell();
+        }
+    }
+    
+    function updateNextBell() {
+        if (!isSchoolDay()) return;
+        
+        const now = new Date();
+        const currentTime = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+        const nextSchedule = schedules.find(s => s.waktu > currentTime);
+        
+        if (nextSchedule) {
+            document.getElementById('nextBell').innerHTML = `⏰ Jadwal berikutnya: ${nextSchedule.waktu} - ${nextSchedule.keterangan}`;
+        } else {
+            document.getElementById('nextBell').innerHTML = `✅ Semua jadwal hari ini telah terlewati`;
+        }
+    }
+    
+    function displaySchedules() {
+        const container = document.getElementById('scheduleList');
+        
+        if (!isSchoolDay()) {
+            container.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:40px; background:#fef2f2; border-radius:15px;">🏖️ Hari Sabtu/Minggu - Tidak Ada Jadwal Bel<br><small>Sistem otomatis nonaktif</small></div>`;
+            return;
+        }
+        
+        if (schedules.length === 0) {
+            container.innerHTML = '<div style="grid-column:1/-1; text-align:center;">Belum ada jadwal</div>';
+            return;
+        }
+        
+        let html = '';
+        schedules.forEach(schedule => {
+            // Tentukan label dan icon berdasarkan jenis
+            let jenisLabel = '';
+            let jenisIcon = '';
+            
+            if (schedule.jenis === 'masuk') {
+                jenisIcon = '🔔';
+                jenisLabel = 'BEL MASUK';
+            } else if (schedule.jenis === 'istirahat') {
+                jenisIcon = '🍽️';
+                jenisLabel = 'BEL ISTIRAHAT';
+            } else if (schedule.jenis === 'pulang') {
+                jenisIcon = '🏠';
+                jenisLabel = 'BEL PULANG';
+            } else {
+                jenisIcon = '🔔';
+                jenisLabel = 'BEL';
+            }
+            
+            html += `
+                <div class="schedule-item ${schedule.jenis}">
+                    <div class="schedule-time">🕐 ${schedule.waktu}</div>
+                    <div class="schedule-desc">${schedule.keterangan}</div>
+                    <div class="schedule-type type-${schedule.jenis}">${jenisIcon} ${jenisLabel}</div>
+                </div>
+            `;
+        });
+        container.innerHTML = html;
+    }
+    
+    function requestNotificationPermission() {
+        if ('Notification' in window && Notification.permission !== 'granted' && Notification.permission !== 'denied') {
+            Notification.requestPermission();
+        }
+    }
+    
+    // Inisialisasi
+    loadSchedules();
+    updateClock();
+    checkAndPlayBell();
+    displaySchedules();
+    requestNotificationPermission();
+    
+    // Auto refresh setiap detik untuk jam
+    setInterval(() => {
+        updateClock();
+        checkAndPlayBell();
+    }, 1000);
+    
+    // Refresh tampilan jadwal setiap menit (untuk update hari)
+    setInterval(() => {
+        displaySchedules();
+    }, 60000);
+    
+    // Refresh data dari localStorage setiap 5 menit
+    setInterval(() => {
+        loadSchedules();
+        displaySchedules();
+    }, 300000);
+</script>
+</body>
+</html>
